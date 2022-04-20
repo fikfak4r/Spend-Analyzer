@@ -1,0 +1,369 @@
+﻿<!doctype html>
+
+@{
+    Func<string, HtmlString>
+    json = x => new HtmlString(Serenity.JSON.Stringify(x));
+    var hideNav = (string)Context.Request.Query["hideNav"] == "1";
+    var logged = Serenity.Authorization.Username;
+    var themeCookie = Context.Request.Cookies["ThemePreference"];
+    var theme = !themeCookie.IsEmptyOrNull() ? themeCookie : "blue";
+    var darkSidebar = theme != null && theme.IndexOf("light") < 0;
+    var rtl = System.Globalization.CultureInfo.CurrentUICulture.TextInfo.IsRightToLeft;
+    var user = (UserDefinition)Serenity.Authorization.UserDefinition;
+    var userImage = System.Web.VirtualPathUtility.ToAbsolute(
+    (user == null || string.IsNullOrEmpty(user.UserImage)) ? "data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAFoAAABaCAMAAAAPdrEwAAAAAXNSR0IArs4c6QAAAARnQU1BAACxjwv8YQUAAAMAUExURT0oHC0tLTIwLzQzMzo2NDs4Njo6OkQrHUMtIEkuIEYwIkgyI0o0KkI7NkM+O0g/O1M3K1c7KUFAPkpBPFdAK1pCLVFEPlhANWJHOWJJMWpONGlQNnJZO0FBQU5EQEpJRkxLS1JHQVNKRVBOTF1OR1JRTl5QSlFRUVhWVFlYVltbWmJUTGtRRWpWTGBeWmtbUXVcQXZbT3hURGNhXnhhRnVkW3hhVntlWmRkZG1qZWxranBsZ3FuaXRxbHt0bXNzc3l2cHx4coVQOIBcSopbRoVxWpRwX55yXYNtYYtvYYxxZIN/eZV1ZZV7bZt6aqZhQ65hQb1oQ6J9a+w4Puw9QsdlPMhnPsVrRcVuSclrQ8RxTMxyTMV1UsR4VsF7XMt2Uc55U859WtB6VdF9WcB/YexGS+5cYfBkafFtcfF3evJ4fIWBe4mFfpSEcJWHeZ6Pf6mDb6mKer6Far2IbrCJdbyMdLiPerCQfruRfM+CX9OAXMCAYsCSfNWFYdaJZteKaNiMatmQbtuTc9qXe92Yd96ZeuCdfYSEhIuHgI2JgoqKipKNhpmNhJWRiZmUjJ6ZkJ2dnaKWjKGck62dlLWTgbqXhLmZh7ibirifkKWgl6ahmKiimaqkm6umnKymna6onrailLWpnbiplbusmq+poKmpqbCqoLKsorOtpLWroLSsorSupLWwprexqLm5ucOXgMaZgcuchdKdg8iijcaol82mkdCgh9Ojit+gg9mmjdypjtKqld2qkNiumN6znMS9tOqKiuGfgPOChvSMj/SNkOKjhOOmieWqjOWtkeKumOiukeawlOG1numyluq1muy4ne28o+u+qsPBv8vBtsvFv+/Apu3CrezEsu/It/DAp/DBqPHHsfHJtPLNusPDw8rGwc7JwtbW1tjU0d/b19vb2+/RxeDb1+nd1/nCw/nKzPPTwvTXyPTZy/Xd0fvW2Pva2/fg0/jl2+Tj4+jk4evr6/fo4fnr5fzt7Pvx7PTz8/318/349v7+/gAAAAAAAAAAAIt9dAgAAAEAdFJOU////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////wBT9wclAAAACXBIWXMAABYlAAAWJQFJUiTwAAAAGXRFWHRTb2Z0d2FyZQBwYWludC5uZXQgNC4wLjEzNANbegAAClFJREFUaEO1mX90FFcVx0k3efVHGzWxVbRT1tJ0YKNHNHrYxNJW688ey6mEFjYbSdxFqqb+KBSNsRuW0Y1GJFREsYCEtJJ4slo5WKxiK+LpZNZt3+zj6Iaz20DLkfoTrKQcCun84b1v3mzm1+6SP/ye/Jh9797P3Ln3vjczyby0v/YQqYwIqIZIOB+QtwlzP5VDp2+uxA7AJM43BFpHhb1XvujgzVt3P9xggvzE0ZwtkYbtwskjXzQJcKGrvwifE+yh7WPCzyl/NMYFl42u/uJUwa4JBHcLR4d80U3gg9UyARXEDWoCAbLFJ3Bf9AerMi2hIZAJ2SpcbfJFP1whFS7h9QVIbdMub6e40WNbbmlZ1MQ7wFSVC4BpjDpQs/AnglCSJ+ptmONAjfAEVWELA3Kb8J+VNyHDaGh2nulkrjy3PGOeLvHJ9RB6lRacybZ3izjCMXsPtQr3ktzobVtH07ehAw9csAOCwz+KQ0vcAkXchfSgF5GewVIVxW9B8VUpM2RQICx5EjLWUkeg6Ja9+bOyuI0ktQiCJTd6SAIypAC2TZRY7ILhVS0uF24iSUGBsORGjw6iFdjD9oROwhMxDvH9q+bGQzfhB7QAG4Gw5EnIfbOghR9vfkMtCE4yezZLAL76a6x4Px8y0XsFQsiDbuVW6Pt+ViwWC4VikR26c2lzc/MNjfW1V/BoQXWN796B8+wGtDWvrBpaFujAUjYJrkifxAP8ZuzZZ5/63aEdO3b86vfIxblDHI3sauixBWbMpPlYEQI2/fEAvyfzpTFLheL9tdwe3FyN7Ub/FO5baFn/lBsC8hkqFvN3inRXK+NetIF0LBeO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" :
+    "~/upload/" + user.UserImage);
+    }
+
+
+
+    <html lang="en">
+
+    <head>
+        <title>  @(ViewData["Title"])  </title>
+        <partial name="/Views/Shared/SpendAnalyzerHeadLayout.cshtml" />
+
+        @RenderSection("Head", false)
+
+    </head>
+
+
+    <!--<body data-keep-enlarged="true" class="vertical-collpsed" data-layout-size="boxed" data-sidebar="dark">-->
+    <body data-keep-enlarged="true" class="vertical-collped">
+        <input type='hidden' id='spnd-analyzr-i' value='@(user != null ? user.UserId : -1)' />
+        <!-- Begin page -->
+        <div id="layout-wrapper">
+            <header id="page-topbar">
+                <span class="logo-lg" style="margin-left:25px">
+                    <a href="/" class="logo logo-dark">
+                        <img src="/Content/assets/images/logo-dark.png" alt="fda" height="30">
+                    </a>
+                </span>
+                <div class="navbar-header">
+                    <div class="d-flex">
+                        <!-- LOGO -->
+                        <div class="navbar-brand-box">
+                            <img src="" alt="" />
+                            <a href="index.html" class="logo logo-dark">
+                                <span class="logo-sm">
+                                    <img src="assets/images/logo-sm.png" alt="" height="22">
+                                </span>
+                                <span class="logo-lg">
+                                    <img src="assets/images/logo-dark.png" alt="" height="20">
+                                </span>
+                            </a>
+
+                            <a href="index.html" class="logo logo-light">
+                                <span class="logo-sm">
+                                    <img src="assets/images/logo-sm.png" alt="" height="22">
+                                </span>
+                                <span class="logo-lg">
+                                    <img src="assets/images/logo-light.png" alt="" height="20">
+                                </span>
+                            </a>
+                        </div>
+
+                        <button type="button" class="btn btn-sm px-3 font-size-16 header-item waves-effect vertical-menu-btn">
+                            <i class="fa fa-fw fa-bars"></i>
+                        </button>
+
+
+                        <!-- App Search-->
+
+
+
+
+                    </div>
+
+                    <div class="d-flex">
+
+                        <div class="dropdown d-inline-block d-lg-none ms-2">
+                            <button type="button" class="btn header-item noti-icon waves-effect" id="page-header-search-dropdown"
+                                    data-bs-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                                <i class="uil-search"></i>
+                            </button>
+                            <div class="dropdown-menu dropdown-menu-lg dropdown-menu-end p-0"
+                                 aria-labelledby="page-header-search-dropdown">
+
+                                <form class="p-3">
+                                    <div class="form-group m-0">
+                                        <div class="input-group">
+                                            <input type="text" class="form-control" placeholder="Search..." aria-label="Recipient's username">
+                                            <div class="input-group-append">
+                                                <button class="btn btn-primary" type="submit"><i class="mdi mdi-magnify"></i></button>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </form>
+                            </div>
+                        </div>
+
+
+
+                        <div class="dropdown d-none d-lg-inline-block ms-1">
+                            <button type="button" class="btn header-item noti-icon waves-effect" data-bs-toggle="fullscreen">
+                                <i class="uil-minus-path"></i>
+                            </button>
+                        </div>
+
+
+                        <div class="dropdown d-inline-block">
+                            <button type="button" class="btn header-item waves-effect" id="page-header-user-dropdown"
+                                    data-bs-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                                <img class="rounded-circle header-profile-user user-image" src="@userImage"
+                                     alt="Header Avatar">
+                                <span class="d-none d-xl-inline-block ms-1 fw-medium font-size-15">Admin</span>
+                                <i class="uil-angle-down d-none d-xl-inline-block font-size-15"></i>
+                            </button>
+                            <div class="dropdown-menu dropdown-menu-end">
+                                <!-- item-->
+                                <!--
+                                <a class="dropdown-item" href="#"><i class="uil uil-user-circle font-size-18 align-middle text-muted me-1"></i> <span class="align-middle">View Profile</span></a>
+                                <a class="dropdown-item" href="#"><i class="uil uil-lock-alt font-size-18 align-middle me-1 text-muted"></i> <span class="align-middle">Change Password</span></a>
+                                -->
+
+
+                                <a class="dropdown-item" href="~/Account/Signout"><i class="uil uil-sign-out-alt font-size-18 align-middle me-1 text-muted"></i> <span class="align-middle">Sign out</span></a>
+                                <form id="logout-form" action="logout" method="POST" style="display: none;">
+                                    <input type="hidden" name="_token" value="ZOsrhmxAsHqivUnB2LG7oCwJMjHJKSTLHSdJxRF2">
+                                </form>
+                            </div>
+                        </div>
+
+                        <div class="dropdown d-inline-block">
+                            <button type="button" class="btn header-item noti-icon right-bar-toggle waves-effect">
+                                <i class="uil-cog"></i>
+                            </button>
+                        </div>
+
+                    </div>
+                </div>
+            </header>        <!-- ========== Left Sidebar Start ========== -->
+            <!-- Left Sidebar End -->        <!-- ============================================================== -->
+            <!-- Start right Content here -->
+            <!-- ============================================================== -->
+            <div class="main-content">
+                <div class="page-content">
+                    <div class="container-fluid" id="container-fluid">
+                        <!-- start page title -->
+                        @RenderBody()
+                        <!-- end row -->
+
+                    </div>
+                    <!-- container-fluid -->
+                </div>
+                <!-- End Page-content -->
+                <footer class="footer">
+                    <div class="container-fluid">
+                        <div class="row">
+                            <div class="col-sm-6">
+                                <script>document.write(new Date().getFullYear())</script> © Roots.
+                            </div>
+                            <div class="col-sm-6">
+                                <div class="text-sm-end d-none d-sm-block">
+                                    <!-- Crafted with <i class="mdi mdi-heart text-danger"></i> by <a href="https://themesbrand.com/" target="_blank" class="text-reset">Themesbrand</a> -->
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </footer>
+            </div>
+            <!-- end main content-->
+        </div>
+        <!-- END layout-wrapper -->
+
+        <div class="vertical-menu">
+
+            <!-- LOGO -->
+            <div class="navbar-brand-box">
+                <a href="index" class="logo logo-dark">
+                    <span class="logo-sm">
+                        <img src="Content/assets/images/logo-sm.png" alt="" height="22">
+                    </span>
+                    <span class="logo-lg">
+                        <img src="Content/assets/images/logo-dak.png" alt="" height="20">
+                    </span>
+                </a>
+
+                <a href="index" class="logo logo-light">
+                    <span class="logo-sm">
+                        <img src="Content/assets/images/logo-sm.png" alt="" height="22">
+                    </span>
+                    <span class="logo-lg">
+                        <img src="Content/assets/images/logo-light.png" alt="" height="20">
+                    </span>
+                </a>
+            </div>
+
+            <button type="button" class="btn btn-sm px-3 font-size-16 header-item waves-effect vertical-menu-btn">
+                <i class="fa fa-fw fa-bars"></i>
+            </button>
+
+
+            <center><div id="spnd-sdbr-prgrss-a" style="margin-top:115px"></div></center>
+
+
+
+            <div data-simplebar class="sidebar-menu-scroll hidden" id='spd-anlyzr-side-bar'>
+
+
+                <!--- Sidemenu -->
+                <div id="sidebar-menu" class="">
+                    <!-- Left Menu Start -->
+
+                    <ul class="metismenu list-unstyled" id="side-menu" style="margin-top:0;padding-top:0">
+                        <li class="menu-title menu-title-item" style='margin:0 0 32px 0'>
+                            <center><button id="apply-filter" style='width:100%'></button></center>
+                        </li>
+                        <li class="menu-title label-font">Select a date range</li>
+
+
+                        <li class="menu-title menu-title-item">
+
+
+                            <input id="daterange" name="daterange" type="text">
+
+                        </li>
+
+
+                        <li class="menu-title label-font">Customer segment</li>
+
+                        <li class="menu-title menu-title-item">
+                            <input id="expense-category" name="expense-category" type="text" class="form-control">
+                        </li>
+
+                        <li class="menu-title label-font">AGE RANGE</li>
+                        <li class="menu-title menu-title-item">
+                            <input id="agerange" name="agerange" type="text">
+
+                        </li>
+
+
+
+                        <li class="menu-title label-font">Product</li>
+                        <li class="menu-title menu-title-item">
+                            <input id="product" name="" type="text">
+
+                        </li>
+
+
+                        <li class="menu-title label-font">Account type</li>
+
+                        <li class="menu-title menu-title-item">
+                            <input id="account-type" name="expense-category" type="text" class="form-control">
+                        </li>
+
+                        <li class="menu-title label-font">Currency code</li>
+                        <li class="menu-title menu-title-item">
+                            <input id="cur-code-ngn" type="checkbox" class='cust-type' /> &nbsp;
+                        </li>
+
+                        <li class="menu-title label-font">Tenure</li>
+                        <li class="menu-title menu-title-item">
+                            <input id="tenure" name="tenure" type="text">
+
+                        </li>
+
+                        <!--
+                        <li class="menu-title label-font">Customer type</li>
+                        <li class="menu-title menu-title-item">
+                            <input id="retail" type="checkbox" class='cust-type' /> &nbsp;
+                            <input id="org" type="checkbox" class='filter-cust-type-org' />
+                        </li>
+
+
+
+                        <li class="menu-title label-font">Amount</li>
+
+                        <li class="menu-title menu-title-item">
+                            <div class="amount-filter">
+                                <div class="min-numeric amt-filter" style="width:100%">
+                                    <label class="inlineAlign minLabel">Min</label>
+                                    <label class="inlineAlign maxLabel" style="float:right;">Max</label>
+                                    <div style="width:100%;height:50%;z-index:10000;">
+                                        <div id="range"></div>
+                                    </div>
+                                </div>
+                            </div>
+                        </li>
+
+                        -->
+
+                        <li class="menu-title label-font">Branches</li>
+
+
+                        <li class="menu-title menu-title-item">
+                           
+                                <div id="tr-syncfsn"></div>
+                          
+                            </li>
+
+                    </ul>
+
+                </div>
+            </div>
+            <!-- Sidebar -->
+        </div>
+
+
+
+
+        <!-- Right Sidebar -->
+        <!-- Right Sidebar -->
+        <div class="right-bar">
+            <div data-simplebar class="h-100">
+
+                <div class="rightbar-title d-flex align-items-center px-3 py-4">
+
+                    <h5 class="m-0 me-2">Settings</h5>
+
+                    <a href="javascript:void(0);" class="right-bar-toggle ms-auto">
+                        <i class="mdi mdi-close noti-icon"></i>
+                    </a>
+                </div>
+
+
+
+                <!-- Settings -->
+                <hr class="mt-0" />
+                <h6 class="text-center mb-0">Choose Layouts</h6>
+                <div id="tab_adaptive" class="p-4 border-top">
+                    <partial name="/Modules/Common/Dashboard/SideBar.cshtml" />
+                </div>
+
+            </div> <!-- end slimscroll-menu-->
+        </div>
+        <!-- /Right-bar -->
+        <!-- Right bar overlay-->
+        <div class="rightbar-overlay"></div>    <!-- /Right-bar -->
+        <!-- JAVASCRIPT -->
+        <!-- JAVASCRIPT -->
+        <!--<script src="Content/assets/libs/jquery/jquery.min.js"></script>-->
+
+        <script src="/Content/assets/libs/bootstrap/bootstrap.min.js"></script>
+        <script src="/Content/assets/libs/metismenu/metismenu.min.js"></script>
+        <script src="/Content/assets/libs/simplebar/simplebar.min.js"></script>
+        <script src="/Content/assets/libs/node-waves/node-waves.min.js"></script>
+        <script src="/Content/assets/libs/waypoints/waypoints.min.js"></script>
+        <script src="/Content/assets/libs/jquery-counterup/jquery-counterup.min.js"></script>
+
+        <!-- apexcharts -->
+        <script src="/Content/assets/libs/apexcharts/apexcharts.min.js"></script>
+        <script src="/Content/assets/js/pages/dashboard.init.js"></script>
+
+        <!-- App js -->
+        <script src="/Content/assets/js/app.min.js"></script>
+
+
+        <style>
+            .logo-lg {
+                float: left !important
+            }
+            .sdbr-branches-treevw{
+                margin-bottom:25px
+            }
+        </style>
+
+    </body>
+
+</html>

@@ -1,0 +1,311 @@
+﻿<!doctype html>
+
+@{
+    Func<string, HtmlString>
+    json = x => new HtmlString(Serenity.JSON.Stringify(x));
+    var hideNav = (string)Context.Request.Query["hideNav"] == "1";
+    var logged = Serenity.Authorization.Username;
+    var themeCookie = Context.Request.Cookies["ThemePreference"];
+    var theme = !themeCookie.IsEmptyOrNull() ? themeCookie : "blue";
+    var darkSidebar = theme != null && theme.IndexOf("light") < 0;
+    var rtl = System.Globalization.CultureInfo.CurrentUICulture.TextInfo.IsRightToLeft;
+    var user = (UserDefinition)Serenity.Authorization.UserDefinition;
+    var userImage = System.Web.VirtualPathUtility.ToAbsolute(
+    (user == null || string.IsNullOrEmpty(user.UserImage)) ? "data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAFoAAABaCAMAAAAPdrEwAAAAAXNSR0IArs4c6QAAAARnQU1BAACxjwv8YQUAAAMAUExURT0oHC0tLTIwLzQzMzo2NDs4Njo6OkQrHUMtIEkuIEYwIkgyI0o0KkI7NkM+O0g/O1M3K1c7KUFAPkpBPFdAK1pCLVFEPlhANWJHOWJJMWpONGlQNnJZO0FBQU5EQEpJRkxLS1JHQVNKRVBOTF1OR1JRTl5QSlFRUVhWVFlYVltbWmJUTGtRRWpWTGBeWmtbUXVcQXZbT3hURGNhXnhhRnVkW3hhVntlWmRkZG1qZWxranBsZ3FuaXRxbHt0bXNzc3l2cHx4coVQOIBcSopbRoVxWpRwX55yXYNtYYtvYYxxZIN/eZV1ZZV7bZt6aqZhQ65hQb1oQ6J9a+w4Puw9QsdlPMhnPsVrRcVuSclrQ8RxTMxyTMV1UsR4VsF7XMt2Uc55U859WtB6VdF9WcB/YexGS+5cYfBkafFtcfF3evJ4fIWBe4mFfpSEcJWHeZ6Pf6mDb6mKer6Far2IbrCJdbyMdLiPerCQfruRfM+CX9OAXMCAYsCSfNWFYdaJZteKaNiMatmQbtuTc9qXe92Yd96ZeuCdfYSEhIuHgI2JgoqKipKNhpmNhJWRiZmUjJ6ZkJ2dnaKWjKGck62dlLWTgbqXhLmZh7ibirifkKWgl6ahmKiimaqkm6umnKymna6onrailLWpnbiplbusmq+poKmpqbCqoLKsorOtpLWroLSsorSupLWwprexqLm5ucOXgMaZgcuchdKdg8iijcaol82mkdCgh9Ojit+gg9mmjdypjtKqld2qkNiumN6znMS9tOqKiuGfgPOChvSMj/SNkOKjhOOmieWqjOWtkeKumOiukeawlOG1numyluq1muy4ne28o+u+qsPBv8vBtsvFv+/Apu3CrezEsu/It/DAp/DBqPHHsfHJtPLNusPDw8rGwc7JwtbW1tjU0d/b19vb2+/RxeDb1+nd1/nCw/nKzPPTwvTXyPTZy/Xd0fvW2Pva2/fg0/jl2+Tj4+jk4evr6/fo4fnr5fzt7Pvx7PTz8/318/349v7+/gAAAAAAAAAAAIt9dAgAAAEAdFJOU////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////wBT9wclAAAACXBIWXMAABYlAAAWJQFJUiTwAAAAGXRFWHRTb2Z0d2FyZQBwYWludC5uZXQgNC4wLjEzNANbegAAClFJREFUaEO1mX90FFcVx0k3efVHGzWxVbRT1tJ0YKNHNHrYxNJW688ey6mEFjYbSdxFqqb+KBSNsRuW0Y1GJFREsYCEtJJ4slo5WKxiK+LpZNZt3+zj6Iaz20DLkfoTrKQcCun84b1v3mzm1+6SP/ye/Jh9797P3Ln3vjczyby0v/YQqYwIqIZIOB+QtwlzP5VDp2+uxA7AJM43BFpHhb1XvujgzVt3P9xggvzE0ZwtkYbtwskjXzQJcKGrvwifE+yh7WPCzyl/NMYFl42u/uJUwa4JBHcLR4d80U3gg9UyARXEDWoCAbLFJ3Bf9AerMi2hIZAJ2SpcbfJFP1whFS7h9QVIbdMub6e40WNbbmlZ1MQ7wFSVC4BpjDpQs/AnglCSJ+ptmONAjfAEVWELA3Kb8J+VNyHDaGh2nulkrjy3PGOeLvHJ9RB6lRacybZ3izjCMXsPtQr3ktzobVtH07ehAw9csAOCwz+KQ0vcAkXchfSgF5GewVIVxW9B8VUpM2RQICx5EjLWUkeg6Ja9+bOyuI0ktQiCJTd6SAIypAC2TZRY7ILhVS0uF24iSUGBsORGjw6iFdjD9oROwhMxDvH9q+bGQzfhB7QAG4Gw5EnIfbOghR9vfkMtCE4yezZLAL76a6x4Px8y0XsFQsiDbuVW6Pt+ViwWC4VikR26c2lzc/MNjfW1V/BoQXWN796B8+wGtDWvrBpaFujAUjYJrkifxAP8ZuzZZ5/63aEdO3b86vfIxblDHI3sauixBWbMpPlYEQI2/fEAvyfzpTFLheL9tdwe3FyN7Ub/FO5baFn/lBsC8hkqFvN3inRXK+NetIF0LBeO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" :
+    "~/upload/" + user.UserImage);
+    }
+
+
+
+    <html lang="en">
+
+    <head>
+        <title>  @(ViewData["Title"])  </title>
+
+
+        <partial name="/Views/Shared/SpendAnalyzerHeadLayoutForOtherPages.cshtml" />
+        @RenderSection("Head", false)
+        @Html.StyleBundle("SpendAnalyzer")
+
+
+    </head>
+
+    <body data-layout="horizontal" data-topbar="colored">
+        <input type='hidden' id='spnd-analyzr-i' value='@user.UserId' />
+
+        <!-- Begin page -->
+        <div id="layout-wrapper">
+
+            <header id="page-topbar">
+                <div class="navbar-header">
+                    <div class="d-flex">
+                        <!-- LOGO -->
+                        <div class="navbar-brand-box">
+                            <a href="index.html" class="logo logo-dark">
+                                <span class="logo-sm">
+                                    <img src="Content/assets/images/logo-dark.png" alt="" height="20">
+                                </span>
+                                <span class="logo-lg">
+                                    <img src="Content/assets/images/logo-dark.png" alt="" height="20">
+                                </span>
+                            </a>
+
+                            <a href="/" class="logo logo-light">
+                                <span class="logo-sm">
+                                    <img src="Content/assets/images/logo-light.png?q=1" alt="" height="40">
+                                </span>
+                                <span class="logo-lg">
+                                    <img src="/Content/assets/images/logo-light.png?q=2" alt="" height="40">
+                                </span>
+                            </a>
+                        </div>
+
+                        <button type="button" class="btn btn-sm px-3 font-size-16 d-lg-none header-item waves-effect waves-light" data-bs-toggle="collapse" data-bs-target="#topnav-menu-content">
+                            <i class="fa fa-fw fa-bars"></i>
+                        </button>
+
+                        <!-- App Search-->
+                        <form class="app-search d-none d-lg-block">
+                            <div class="position-relative">
+                                <input type="text" class="form-control" placeholder="Search...">
+                                <span class="uil-search"></span>
+                            </div>
+                        </form>
+                    </div>
+
+                    <div class="d-flex">
+
+                        <div class="dropdown d-inline-block d-lg-none ms-2">
+                            <button type="button" class="btn header-item noti-icon waves-effect" id="page-header-search-dropdown" data-bs-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                                <i class="uil-search"></i>
+                            </button>
+                            <div class="dropdown-menu dropdown-menu-lg dropdown-menu-end p-0" aria-labelledby="page-header-search-dropdown">
+
+                                <form class="p-3">
+                                    <div class="m-0">
+                                        <div class="input-group">
+                                            <input type="text" class="form-control" placeholder="Search ..." aria-label="Recipient's username">
+                                            <div class="input-group-append">
+                                                <button class="btn btn-primary" type="submit"><i class="mdi mdi-magnify"></i></button>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </form>
+                            </div>
+                        </div>
+
+
+
+                        <div class="dropdown d-none d-lg-inline-block ms-1">
+                            <button type="button" class="btn header-item noti-icon waves-effect" data-bs-toggle="fullscreen">
+                                <i class="uil-minus-path"></i>
+                            </button>
+                        </div>
+
+
+                        <div class="dropdown d-inline-block">
+                            <button type="button" class="btn header-item waves-effect" id="page-header-user-dropdown" data-bs-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                                <img class="rounded-circle header-profile-user" src="@userImage" alt="Header Avatar">
+                                <span class="d-none d-xl-inline-block ms-1 fw-medium font-size-15">@Serenity.Authorization.Username</span>
+                                <i class="uil-angle-down d-none d-xl-inline-block font-size-15"></i>
+                            </button>
+                            <div class="dropdown-menu dropdown-menu-end">
+                                <!-- item-->
+                                <!--
+                                <a class="dropdown-item" href="#"><i class="uil uil-user-circle font-size-18 align-middle text-muted me-1"></i> <span class="align-middle">View Profile</span></a>
+                                <a class="dropdown-item" href="#"><i class="uil uil-wallet font-size-18 align-middle me-1 text-muted"></i> <span class="align-middle">My Wallet</span></a>
+                                <a class="dropdown-item d-block" href="#"><i class="uil uil-cog font-size-18 align-middle me-1 text-muted"></i> <span class="align-middle">Settings</span> <span class="badge bg-soft-success rounded-pill mt-1 ms-2">03</span></a>
+                                <a class="dropdown-item" href="#"><i class="uil uil-lock-alt font-size-18 align-middle me-1 text-muted"></i> <span class="align-middle">Lock screen</span></a>
+                                -->
+                                <a class="dropdown-item" href="~/Account/Signout"><i class="uil uil-sign-out-alt font-size-18 align-middle me-1 text-muted"></i> <span class="align-middle">Sign out</span></a>
+                            </div>
+                        </div>
+
+                    
+
+                    </div>
+                </div>
+                <div class="container-fluid">
+                    <div class="topnav">
+
+                        <nav class="navbar navbar-light navbar-expand-lg topnav-menu">
+
+                            <div class="collapse navbar-collapse" id="topnav-menu-content">
+                                <ul class="navbar-nav active">
+
+                                    <li class="nav-item">
+                                        <a class="nav-link" href="/Analyzer/Index">
+                                            <i class="uil-layers me-2"></i> Go to Analyzer
+                                        </a>
+                                    </li>
+
+
+                                    <li class="nav-item dropdown">
+                                        <a class="nav-link dropdown-toggle arrow-none" href="#" id="topnav-pages" role="button">
+                                            <i class="uil-apps me-2"></i>Administration <div class="arrow-down"></div>
+                                        </a>
+                                        <div class="dropdown-menu" aria-labelledby="topnav-pages">
+
+                                            <a href="/Administration/User" class="dropdown-item">User Management</a>
+                                            <a href="/Administration/Role" class="dropdown-item">Roles or Group</a>
+
+                                        </div>
+                                    </li>
+
+
+
+                                </ul>
+                            </div>
+                        </nav>
+                    </div>
+                </div>
+            </header>
+
+
+
+            <!-- ============================================================== -->
+            <!-- Start right Content here -->
+            <!-- ============================================================== -->
+            <div class="main-content">
+
+                <div class="page-content">
+                    <div class="container-fluid">
+
+                        @RenderBody()
+                    </div> <!-- container-fluid -->
+                </div>
+                <!-- End Page-content -->
+
+
+                <footer class="footer">
+                    <div class="container-fluid">
+                        <div class="row">
+                            <div class="col-sm-6">
+                                <script>document.write(new Date().getFullYear())</script> © Roots.
+                            </div>
+                            <div class="col-sm-6">
+                                <div class="text-sm-end d-none d-sm-block">
+                                    <!--Crafted with <i class="mdi mdi-heart text-danger"></i> by <a href="https://themesbrand.com/" target="_blank" class="text-reset">Themesbrand</a>-->
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </footer>
+            </div>
+            <!-- end main content-->
+
+        </div>
+        <!-- END layout-wrapper -->
+        <!-- Right Sidebar -->
+        <div class="right-bar">
+            <div data-simplebar="init" class="h-100">
+                <div class="simplebar-wrapper" style="margin: 0px;">
+                    <div class="simplebar-height-auto-observer-wrapper"><div class="simplebar-height-auto-observer"></div></div><div class="simplebar-mask">
+                        <div class="simplebar-offset" style="right: -17px; bottom: 0px;">
+                            <div class="simplebar-content-wrapper" style="height: 100%; overflow: hidden scroll;">
+                                <div class="simplebar-content" style="padding: 0px;">
+
+                                    <div class="rightbar-title d-flex align-items-center px-3 py-4">
+
+                                        <h5 class="m-0 me-2">Settings</h5>
+
+                                        <a href="javascript:void(0);" class="right-bar-toggle ms-auto">
+                                            <i class="mdi mdi-close noti-icon"></i>
+                                        </a>
+                                    </div>
+
+
+
+                                    <!-- Settings -->
+                                    <hr class="mt-0">
+                                    <h6 class="text-center mb-0">Choose Layouts</h6>
+
+                                    <div class="p-4">
+                                        <div class="mb-2">
+                                            <img src="assets/images/layouts/layout-1.jpg" class="img-thumbnail" alt="layout images">
+                                        </div>
+                                        <div class="form-check form-switch mb-3">
+                                            <input type="checkbox" class="form-check-input theme-choice" id="light-mode-switch" checked="">
+                                            <label class="form-check-label" for="light-mode-switch">Light Mode</label>
+                                        </div>
+
+                                        <div class="mb-2">
+                                            <img src="assets/images/layouts/layout-2.jpg" class="img-thumbnail" alt="layout images">
+                                        </div>
+                                        <div class="form-check form-switch mb-3">
+                                            <input type="checkbox" class="form-check-input theme-choice" id="dark-mode-switch">
+                                            <label class="form-check-label" for="dark-mode-switch">Dark Mode</label>
+                                        </div>
+
+                                        <div class="mb-2">
+                                            <img src="assets/images/layouts/layout-3.jpg" class="img-thumbnail" alt="layout images">
+                                        </div>
+                                        <div class="form-check form-switch mb-3">
+                                            <input type="checkbox" class="form-check-input theme-choice" id="rtl-mode-switch">
+                                            <label class="form-check-label" for="rtl-mode-switch">RTL Mode</label>
+                                        </div>
+
+                                        <div class="mb-2">
+                                            <img src="assets/images/layouts/layout-4.jpg" class="img-thumbnail" alt="layout images">
+                                        </div>
+                                        <div class="form-check form-switch mb-5">
+                                            <input class="form-check-input theme-choice" type="checkbox" id="dark-rtl-mode-switch">
+                                            <label class="form-check-label" for="dark-rtl-mode-switch">Dark RTL Mode</label>
+                                        </div>
+
+
+                                    </div>
+
+                                </div>
+                            </div>
+                        </div>
+                    </div><div class="simplebar-placeholder" style="width: auto; height: 1074px;"></div>
+                </div><div class="simplebar-track simplebar-horizontal" style="visibility: hidden;"><div class="simplebar-scrollbar" style="transform: translate3d(0px, 0px, 0px); display: none;"></div></div><div class="simplebar-track simplebar-vertical" style="visibility: visible;"><div class="simplebar-scrollbar" style="height: 300px; transform: translate3d(0px, 0px, 0px); display: block;"></div></div>
+            </div> <!-- end slimscroll-menu-->
+        </div>
+        <!-- /Right-bar -->
+        <!-- Right bar overlay-->
+        <div class="rightbar-overlay"></div>
+
+        <!-- JAVASCRIPT -->
+        <script src="assets/libs/jquery/jquery.min.js"></script>
+        <script src="assets/libs/bootstrap/js/bootstrap.bundle.min.js"></script>
+        <script src="assets/libs/metismenu/metisMenu.min.js"></script>
+        <script src="assets/libs/simplebar/simplebar.min.js"></script>
+        <script src="assets/libs/node-waves/waves.min.js"></script>
+        <script src="assets/libs/waypoints/lib/jquery.waypoints.min.js"></script>
+        <script src="assets/libs/jquery.counterup/jquery.counterup.min.js"></script>
+
+        <!-- apexcharts -->
+        <script src="assets/libs/apexcharts/apexcharts.min.js"></script>
+
+        <script src="assets/js/pages/dashboard.init.js"></script>
+
+        <!-- App js -->
+        <script src="assets/js/app.js"></script>
+
+
+
+        <svg id="SvgjsSvg1254" width="2" height="0" xmlns="http://www.w3.org/2000/svg" version="1.1" xmlns:xlink="http://www.w3.org/1999/xlink" xmlns:svgjs="http://svgjs.com/svgjs" style="overflow: hidden; top: -100%; left: -100%; position: absolute; opacity: 0;"><defs id="SvgjsDefs1255"></defs><polyline id="SvgjsPolyline1256" points="0,0"></polyline><path id="SvgjsPath1257" d="M-1 255L-1 255C-1 255 61.18983752813366 255 61.18983752813366 255C61.18983752813366 255 116.45807787612534 255 116.45807787612534 255C116.45807787612534 255 177.647915404259 255 177.647915404259 255C177.647915404259 255 236.86388720567868 255 236.86388720567868 255C236.86388720567868 255 298.0537247338123 255 298.0537247338123 255C298.0537247338123 255 357.269696535232 255 357.269696535232 255C357.269696535232 255 418.45953406336565 255 418.45953406336565 255C418.45953406336565 255 479.64937159149935 255 479.64937159149935 255C479.64937159149935 255 538.865343392919 255 538.865343392919 255C538.865343392919 255 600.0551809210526 255 600.0551809210526 255C600.0551809210526 255 600.0551809210526 255 600.0551809210526 255 "></path></svg>
+
+
+        <!-- JAVASCRIPT -->
+        <!--<script src="Content/assets/libs/jquery/jquery.min.js"></script>-->
+
+        <script src="/Content/assets/libs/bootstrap/bootstrap.min.js"></script>
+        <script src="/Content/assets/libs/metismenu/metismenu.min.js"></script>
+        <script src="/Content/assets/libs/simplebar/simplebar.min.js"></script>
+        <script src="/Content/assets/libs/node-waves/node-waves.min.js"></script>
+        <script src="/Content/assets/libs/waypoints/waypoints.min.js"></script>
+        <script src="/Content/assets/libs/jquery-counterup/jquery-counterup.min.js"></script>
+
+        <!-- apexcharts -->
+        <script src="/Content/assets/libs/apexcharts/apexcharts.min.js"></script>
+        <script src="/Content/assets/js/pages/dashboard.init.js"></script>
+
+        <!-- App js -->
+        <script src="/Content/assets/js/app.min.js"></script>
+        @RenderSection("footer", false)
+    </body>
+
+</html>

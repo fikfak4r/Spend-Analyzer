@@ -1,0 +1,24 @@
+{
+  "RootNamespace": "SpendAnalyzer",
+  "ServerTypings": {
+    "Assemblies": [],
+    "LocalTexts": true
+  },
+  "Connections": [
+    {
+      "Key": "SmoothData",
+      "Tables": [
+        {
+          "Tablename": "dbo.PD_QUERY",
+          "Identifier": "PdQuery",
+          "Module": "BusinessObjects",
+          "PermissionKey": "Administration:General"
+        }
+      ]
+    }
+  ],
+  "BaseRowClasses": [],
+  "RemoveForeignFields": [],
+  "CustomGenerate": {},
+  "CustomSettings": {}
+}

@@ -1,0 +1,53 @@
+﻿
+@{
+    Layout = "~/Views/Shared/SpendAnalyzerLayoutForOtherPages.cshtml";
+    ViewData["Title"] = "User";
+}
+
+@section footer{
+}
+
+
+
+@section Head{
+
+@Html.StyleBundle("Base")
+
+
+@Html.StyleBundle("Site")
+
+
+<script type="application/json" id="ScriptCulture">@Html.Raw(Serenity.JSON.Stringify(new ScriptCulture()))</script>
+<script type="text/javascript">window.paceOptions = { startOnPageLoad: false, ajax: { trackMethods: ['GET', 'POST'], trackWebSockets: false, ignoreURLs: [] } };</script>
+
+@Html.ScriptBundle("Base")
+@Html.ScriptBundle("Site")
+@Html.LocalTextScript("Site") 
+
+
+<script type="text/javascript">
+    @Html.Raw(DynamicScriptManager.GetScriptText("Lookup.Administration.Language"))
+    @Html.Raw(DynamicScriptManager.GetScriptText("RegisteredScripts"))
+</script>
+
+  @Html.StyleBundle("SpendAnalyzer")
+    }
+    <section class="content" style="min-height: 493px;">
+
+<div id="GridDiv"></div>
+
+</section>
+<script type="text/javascript">
+    jQuery(function () {
+        new SpendAnalyzer.Administration.UserGrid($('#GridDiv'), {
+        });
+
+        Q.initFullHeightGridPage($('#GridDiv'));
+    });
+</script>
+
+
+<div id="user-synfsn-dlg">
+<div id="tr-syncfsn"></div>
+</div>
+

@@ -1,0 +1,97 @@
+﻿   @{
+        ViewData["Title"] = "Spend Analyzer";
+   }
+
+@*@section Head{
+<!--   <link href="/Content/syncfusion/style.css" rel="stylesheet" type="text/css" /> -->
+@Html.StyleBundle("Site")
+
+@Html.ScriptBundle("Base")
+@Html.ScriptBundle("Site")
+
+    @Html.StyleBundle("SpendAnalyzer")
+
+}*@
+
+@section Head{
+
+@Html.StyleBundle("Base")
+@Html.StyleBundle("Site")
+
+<script type="application/json" id="ScriptCulture">
+    @Html.Raw(Serenity.JSON.Stringify(new ScriptCulture()))
+</script>
+<script type="text/javascript">window.paceOptions = { startOnPageLoad: false, ajax: { trackMethods: ['GET', 'POST'], trackWebSockets: false, ignoreURLs: [] } };</script>
+
+@Html.ScriptBundle("Base")
+@*@Html.ScriptBundle("SmoothData")*@
+@Html.ScriptBundle("Site")
+@Html.LocalTextScript("Site")
+
+
+<script type="text/javascript">
+    @Html.Raw(DynamicScriptManager.GetScriptText("Lookup.Administration.Language"))
+    @Html.Raw(DynamicScriptManager.GetScriptText("RegisteredScripts"))
+</script>
+
+  @Html.StyleBundle("SpendAnalyzer");
+
+    }
+
+
+
+
+<!--<div class="row">
+    <div class="col-12">
+        <div class="page-title-box d-flex align-items-center justify-content-between">
+
+            
+                <h4 class="mb-0">Spend Analyzer</h4>
+                
+
+            <div class="page-title-right">
+                <ol class="breadcrumb m-0">
+                    <li class="breadcrumb-item"><a href="javascript: void(0);">Welcome</a></li>
+                    <li class="breadcrumb-item active">Boxed Width</li>
+                </ol>
+            </div>
+
+        </div>
+    </div>
+</div>-->
+<!-- end page title -->
+
+
+<div id='spd-anlyzr-tab'></div>
+
+@*
+<partial name="/Views/Tabs/Home.cshtml" />*@
+
+
+
+
+
+<partial name="/Views/Tabs/SpendDashboard.cshtml" />
+<partial name="/Views/Tabs/ChannelAnalytics.cshtml" />
+<partial name="/Views/Tabs/Models.cshtml" />
+
+@*
+<partial name="/Views/Tabs/CreditScoring.cshtml" />*@
+
+<partial name="/Views/Tabs/CampaignDashboard.cshtml" />
+
+<partial name="/Views/Tabs/Bitcoin.cshtml" />
+
+<partial name="/Views/Tabs/Workspace.cshtml" />
+
+
+
+
+<script type="text/javascript">
+    jQuery(function () {
+        var lty = new SpendAnalyzer.BusinessObjects.SpndAnlyzrLyt()
+        //lty.Load();
+        //new SpendAnalyzer.BusinessObjects.DshBrdChnlSpdTypPie();
+
+    });
+</script>

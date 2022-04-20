@@ -1,0 +1,11 @@
+{
+  "Navigation.Dashboard": "Spend Analyzer",
+  "Permission.Administration:": "Administrationa",
+  "Permission.Administration:Security": "User, Role Management and Permissions",
+  "Permission.Administration:Translation": "Languages and Translations",
+  "Permission.SpendAnalyzer:": "Inventory Node",
+  "Permission.SpendAnalyzer:Bank:": "Please Bank",
+  "Permission.SpendAnalyzer:Bank:Read": "Please Read Bank Statement"
+
+
+}
